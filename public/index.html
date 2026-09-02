@@ -254,9 +254,17 @@
       justify-content: space-between;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
+      overflow: hidden;
     }
     .guide-title { font-size: 0.85rem; font-weight: 700; color: #f1f5f9; }
     .guide-desc { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* WhatsApp Button Layout Fix */
+    .guide-item a[href*="whatsapp"], .guide-item div:has(> a[href*="whatsapp"]) {
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
 
     .guestbook-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
     .guestbook-input, .guestbook-textarea {
@@ -341,12 +349,6 @@
     .btn-copy { background: rgba(255,255,255,0.15); color: #fff; padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; }
     .btn-copy:hover { background: rgba(255,255,255,0.3); }
     .badge-empty { color: var(--text-muted); font-style: italic; text-align: center; padding: 20px 0; }
-    
-    /* WhatsApp Button Fix (Verhindert das Rausragen) */
-    a[href*="whatsapp"], .whatsapp-btn {
-      max-width: 100%;
-      box-sizing: border-box;
-    }
   </style>
 </head>
 <body>
@@ -619,7 +621,7 @@
           <div class="guide-title">👑 <span id="t-host-role">Hauschef*in / Gastgeber*in</span>: Peter Emeis Dünnes</div>
           <div class="guide-desc" id="t-host-desc">📞 01577 4978442 (Notfallkontakt & Fragen)</div>
         </div>
-        <div style="display: flex; gap: 6px;">
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
           <a href="tel:015774978442" class="maps-link" style="background: rgba(14, 165, 233, 0.3); color: #fff;" id="t-btn-call">📞 Anrufen</a>
           <a href="https://wa.me/4915774978442" target="_blank" class="maps-link" style="background: rgba(16, 185, 129, 0.25); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">💬 WhatsApp</a>
         </div>
@@ -631,7 +633,7 @@
           <div class="guide-title" style="color: #fca5a5;" id="t-sos-title">🚨 Offizieller Notruf (Lebensgefahr)</div>
           <div class="guide-desc" id="t-sos-desc">Feuerwehr & Rettungsdienst (112) | Polizei (110)</div>
         </div>
-        <div style="display: flex; gap: 6px;">
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
           <a href="tel:112" class="maps-link" style="background: rgba(239, 68, 68, 0.3); border-color: rgba(239, 68, 68, 0.5); color: #fff;">🚒 112</a>
           <a href="tel:110" class="maps-link" style="background: rgba(14, 165, 233, 0.3); border-color: rgba(14, 165, 233, 0.5); color: #fff;">🚓 110</a>
         </div>
