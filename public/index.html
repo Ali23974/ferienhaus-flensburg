@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Ferienhaus Flensburg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-gradient: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      --card-bg: rgba(15, 23, 42, 0.88);
+      --card-border: rgba(255, 255, 255, 0.16);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --input-bg: rgba(8, 14, 28, 0.85);
+      --input-border: rgba(255, 255, 255, 0.18);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    body {
+      /* Helles, klares Flensburg-Hafenbild mit dezentem Schutzschleier für beste Lesbarkeit */
+      background: 
+        linear-gradient(rgba(10, 20, 38, 0.42), rgba(10, 20, 38, 0.48)),
+        url('https://www.flensburger-foerde.de/fileadmin/_processed_/a/8/csm_historischer-hafen-flensburg_8199d642bf.jpg') center center / cover no-repeat fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 40px 20px 80px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: relative;
+    }
+    
+    .top-bar { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+    .lang-btn {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 13px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+    .lang-btn:hover { color: #fff; background: rgba(15, 23, 42, 0.95); }
+    .lang-btn.active {
+      background: var(--primary-gradient);
+      color: #fff;
+      border-color: rgba(255,255,255,0.3);
+      box-shadow: 0 0 14px rgba(14, 165, 233, 0.5);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 8px;
+      background: rgba(15, 23, 42, 0.65);
+      padding: 22px 18px;
+      border-radius: var(--radius);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(14, 165, 233, 0.22);
+      border: 1px solid rgba(14, 165, 233, 0.45);
+      color: #38bdf8;
+      padding: 5px 15px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    header h1 {
+      font-size: 2.3rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 30%, #e2e8f0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    header p { color: #cbd5e1; font-size: 0.95rem; }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 26px;
+      box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.65);
+    }
+    .card h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+    .weather-widget {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.3) 0%, rgba(20, 184, 166, 0.3) 100%);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+    .weather-temp { font-size: 1.85rem; font-weight: 800; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+    .weather-desc { font-size: 0.85rem; color: #f1f5f9; }
+
+    .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .cal-btn {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid var(--card-border);
+      padding: 5px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cal-btn:hover { background: rgba(255,255,255,0.22); transform: scale(1.06); }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+    .cal-weekday { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); padding: 4px 0; }
+    .cal-day {
+      padding: 10px 0;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: rgba(6, 12, 24, 0.6);
+      border: 1px solid var(--card-border);
+      color: #cbd5e1;
+      transition: all 0.15s ease;
+    }
+    .cal-day.empty { background: transparent; border: none; }
+    .cal-day.free {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: rgba(16, 185, 129, 0.45);
+      color: #6ee7b7;
+      cursor: pointer;
+    }
+    .cal-day.free:hover {
+      background: rgba(16, 185, 129, 0.4);
+      transform: scale(1.05);
+    }
+    .cal-day.booked { background: rgba(239, 68, 68, 0.25); border-color: rgba(239, 68, 68, 0.5); color: #fca5a5; text-decoration: line-through; }
+    .cal-legend { display: flex; gap: 16px; margin-top: 14px; font-size: 0.8rem; color: #cbd5e1; justify-content: center; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    .location-box {
+      background: rgba(6, 12, 24, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .location-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .location-address { font-weight: 600; font-size: 1rem; color: #f1f5f9; }
+    .maps-link {
+      background: rgba(14, 165, 233, 0.22);
+      border: 1px solid rgba(14, 165, 233, 0.45);
+      color: #7dd3fc;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 7px 13px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .maps-link:hover { background: rgba(14, 165, 233, 0.45); color: #fff; transform: translateY(-1px); }
+    .location-details { font-size: 0.9rem; color: #cbd5e1; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; }
+
+    .tasks-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: rgba(6, 12, 24, 0.55);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+    .task-icon { font-size: 1.3rem; line-height: 1; }
+    .task-folder-note {
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px solid rgba(14, 165, 233, 0.4);
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      color: #7dd3fc;
+      margin-top: 10px;
+    }
+
+    .amenities-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 520px) { .amenities-grid { grid-template-columns: 1fr; } }
+    .amenity-item {
+      background: rgba(6, 12, 24, 0.55);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .amenity-icon { font-size: 1.4rem; }
+    .amenity-title { font-size: 0.85rem; font-weight: 700; color: #f1f5f9; }
+    .amenity-desc { font-size: 0.75rem; color: var(--text-muted); }
+
+    .guide-item {
+      background: rgba(6, 12, 24, 0.55);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .guide-title { font-size: 0.85rem; font-weight: 700; color: #f1f5f9; }
+    .guide-desc { font-size: 0.75rem; color: var(--text-muted); }
+
+    .guestbook-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .guestbook-input, .guestbook-textarea {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 9px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .guestbook-input:focus, .guestbook-textarea:focus { border-color: #38bdf8; }
+    .guestbook-textarea { resize: vertical; min-height: 70px; }
+    .guestbook-list { display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; padding-right: 4px; }
+    .guestbook-entry {
+      background: rgba(6, 12, 24, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+    }
+    .guestbook-meta { display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: #cbd5e1; margin-bottom: 4px; }
+    .guestbook-date { font-size: 0.75rem; color: var(--text-muted); }
+    .guestbook-msg { color: #94a3b8; line-height: 1.5; }
+
+    .form-group { margin-bottom: 18px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px) { .grid-2 { grid-template-columns: 1fr; } }
+    
+    label { display: block; font-size: 0.8rem; font-weight: 600; color: #cbd5e1; margin-bottom: 8px; text-transform: uppercase; }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      color: #fff;
+      outline: none;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+    input:focus { border-color: #38bdf8; background: rgba(6, 12, 24, 0.95); }
+    
+    button { cursor: pointer; border: none; font-weight: 700; border-radius: 10px; transition: all 0.2s ease; font-size: 0.95rem; }
+    .btn-primary {
+      width: 100%;
+      background: var(--primary-gradient);
+      color: white;
+      padding: 14px;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(14, 165, 233, 0.45);
+    }
+    .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 12px 20px; white-space: nowrap; }
+    .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5); }
+    .cancel-row { display: flex; gap: 12px; }
+
+    .booking-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .booking-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      background: rgba(6, 12, 24, 0.65);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+    }
+    .booking-name { font-weight: 600; color: #f1f5f9; display: flex; align-items: center; gap: 8px; }
+    .booking-name::before { content: ''; display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }
+    .booking-right { display: flex; align-items: center; gap: 10px; }
+    .booking-dates { color: #94a3b8; font-size: 0.85rem; background: rgba(255, 255, 255, 0.06); padding: 6px 12px; border-radius: 8px; font-weight: 600; }
+    .btn-admin-del { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; display: none; }
+    .btn-admin-del:hover { background: rgba(239, 68, 68, 0.4); color: #fff; }
+    
+    .banner { padding: 16px; border-radius: 10px; font-size: 0.95rem; margin-top: 16px; display: none; line-height: 1.6; }
+    .banner.error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); display: block; }
+    .banner.success { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); display: block; animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes popIn { 0% { transform: scale(0.92); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .token-box { display: inline-flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 6px; font-family: monospace; font-size: 1.1rem; color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+    .btn-copy { background: rgba(255,255,255,0.15); color: #fff; padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; }
+    .btn-copy:hover { background: rgba(255,255,255,0.3); }
+    .badge-empty { color: var(--text-muted); font-style: italic; text-align: center; padding: 20px 0; }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <div class="top-bar">
+      <button class="lang-btn active" onclick="setLanguage('de')">🇩🇪 DE</button>
+      <button class="lang-btn" onclick="setLanguage('en')">🇬🇧 EN</button>
+      <button class="lang-btn" onclick="setLanguage('es')">🇪🇸 ES</button>
+    </div>
+
+    <header>
+      <div class="badge">⚓ Ferienhaus Flensburg</div>
+      <h1 id="t-main-title">Ferienhaus Flensburg</h1>
+      <p id="t-main-sub">Wähle deinen Wunschzeitraum oder verwalte bestehende Reservierungen.</p>
+    </header>
+
+    <!-- Wetter Widget -->
+    <div class="weather-widget">
+      <div>
+        <div style="font-size: 0.8rem; font-weight: 700; color: #38bdf8; text-transform: uppercase;" id="t-weather-badge">⛅ Wetter in Flensburg</div>
+        <div class="weather-desc" id="weatherStatus">Lade Live-Wetter...</div>
+      </div>
+      <div class="weather-temp" id="weatherTemp">--°C</div>
+    </div>
+
+    <!-- Adresse, Anreise & Parken -->
+    <div class="card">
+      <h2>📍 <span id="t-loc-title">Adresse & Anreise</span></h2>
+      <div class="location-box">
+        <div class="location-header">
+          <div>
+            <div class="location-address" id="t-loc-address">Heinrich-Schuldt-Straße 17, 24941 Flensburg</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);" id="t-loc-sub">Einfamilienhaus mit Garten</div>
+          </div>
+          <a href="https://maps.google.com/?q=Heinrich-Schuldt-Stra%C3%9Fe+17,+24941+Flensburg" target="_blank" class="maps-link" id="t-loc-maps">🗺️ In Maps öffnen</a>
+        </div>
+        <div class="location-details" id="t-loc-desc">
+          🔑 <b>Schlüsselsafe:</b> Ein Schlüsselsafe ist vorhanden. Der Code wird dir direkt am Anreisetag mitgeteilt.<br>
+          🚗 <b>Parken:</b> Direkt vor dem Haus und entlang der Straße, sofern freie Plätze vorhanden sind (keine privaten/reservierten Parkplätze).
+        </div>
+      </div>
+    </div>
+
+    <!-- Bus & Nahverkehr (Mobilität) -->
+    <div class="card">
+      <h2>🚌 <span id="t-transit-title">Bus & Nahverkehr (Mobilität)</span></h2>
+      <div class="guide-item">
+        <div>
+          <div class="guide-title" id="t-bus-stops-title">🚏 Haltestellen in der Nähe</div>
+          <div class="guide-desc" id="t-bus-stops-desc">Haltestellen <i>Nerongsallee</i> & <i>Goerdelerstraße</i> (wenige Gehminuten) – Direkte Verbindung zum ZOB / Bahnhof</div>
+        </div>
+        <a href="https://aktiv-bus.de/haltestellenfahrplaene/" target="_blank" class="maps-link" id="t-bus-timetable-btn">🗓️ Fahrpläne</a>
+      </div>
+      <div class="guide-item">
+        <div>
+          <div class="guide-title" id="t-bus-radar-title">📡 Live-Busradar & Route planen</div>
+          <div class="guide-desc" id="t-bus-radar-desc">Echtzeit-Fahrplan und Bus-Positionen auf der Karte anzeigen</div>
+        </div>
+        <a href="https://www.busradar-flensburg.de" target="_blank" class="maps-link" style="background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;" id="t-bus-radar-btn">🗺️ Live-Radar</a>
+      </div>
+    </div>
+
+    <!-- Hauspflichten & Aufgaben -->
+    <div class="card">
+      <h2>🐾 <span id="t-tasks-title">Hauspflichten für Besucher*innen</span></h2>
+      <ul class="tasks-list">
+        <li class="task-item">
+          <span class="task-icon">🐱</span>
+          <div id="t-task-cat"><b>Katzenbetreuung:</b> Unsere Katze bitte morgens und abends füttern sowie regelmäßig mit ihr spielen und ihr Zuwendung schenken.</div>
+        </li>
+        <li class="task-item">
+          <span class="task-icon">📬</span>
+          <div id="t-task-mail"><b>Briefkasten:</b> Bitte regelmäßig leeren und Post im Flur ablegen.</div>
+        </li>
+        <li class="task-item">
+          <span class="task-icon">🗑️</span>
+          <div id="t-task-trash"><b>Mülltonnen:</b> 2x monatlich die entsprechenden Mülltonnen an die Straße stellen.</div>
+        </li>
+        <li class="task-item">
+          <span class="task-icon">🧹</span>
+          <div id="t-task-clean"><b>Vor Abreise:</b> Reinigung und liebevolle Pflege des Hauses sowie des Gartens.</div>
+        </li>
+      </ul>
+      <div class="task-folder-note" id="t-folder-note">
+        📖 <b>Ausführlicher Haus-Ordner:</b> Alle detaillierten Anleitungen, Futterzeiten, Müllkalender und Gerätehinweise findest du im physischen Haus-Ordner vor Ort im Wohnbereich.
+      </div>
+    </div>
+
+    <!-- Visueller Kalender -->
+    <div class="card">
+      <h2>
+        <span>📅 <span id="t-cal-title">Monatsübersicht</span></span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button class="cal-btn" onclick="prevMonth()"><</button>
+          <span id="calMonthYear" style="font-size: 0.95rem; font-weight: 600;"></span>
+          <button class="cal-btn" onclick="nextMonth()">></button>
+        </div>
+      </h2>
+      <div class="cal-grid" id="calWeekdays">
+        <div class="cal-weekday">Mo</div><div class="cal-weekday">Di</div><div class="cal-weekday">Mi</div><div class="cal-weekday">Do</div><div class="cal-weekday">Fr</div><div class="cal-weekday">Sa</div><div class="cal-weekday">So</div>
+      </div>
+      <div class="cal-grid" id="calendarDays" style="margin-top: 6px;"></div>
+      <div class="cal-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div> <span id="t-leg-free">Frei (Klicken zum Buchen)</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> <span id="t-leg-booked">Belegt</span></div>
+      </div>
+    </div>
+
+    <!-- Reservieren -->
+    <div class="card" id="bookingSection">
+      <h2>📅 <span id="t-book-title">Zeitraum reservieren</span></h2>
+      <form id="bookingForm">
+        <div class="form-group">
+          <label id="t-label-name" for="guestName">Name</label>
+          <input type="text" id="guestName" required placeholder="z. B. Onkel Markus / Sarah">
+        </div>
+        <div class="grid-2 form-group">
+          <div>
+            <label id="t-label-start" for="startDate">Anreise</label>
+            <input type="date" id="startDate" required>
+          </div>
+          <div>
+            <label id="t-label-end" for="endDate">Abreise</label>
+            <input type="date" id="endDate" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" id="t-btn-book">Kostenlos Buchen</button>
+      </form>
+      <div id="bookingResult" class="banner"></div>
+    </div>
+
+    <!-- Ausstattung & Highlights -->
+    <div class="card">
+      <h2>✨ <span id="t-amenities-title">Ausstattung & Zimmer</span></h2>
+      <div class="amenities-grid">
+        <div class="amenity-item">
+          <div class="amenity-icon">📶</div>
+          <div>
+            <div class="amenity-title">Highspeed WLAN</div>
+            <div class="amenity-desc">PW: <code style="color:#38bdf8">Canetdeberenguer</code> <button class="btn-copy" onclick="copyWifi('Canetdeberenguer', this)">Kopieren</button></div>
+          </div>
+        </div>
+        <div class="amenity-item">
+          <div class="amenity-icon">📺</div>
+          <div>
+            <div class="amenity-title" id="t-tv-title">Fernseher</div>
+            <div class="amenity-desc" id="t-tv-desc">Smart TV zur freien Verfügung</div>
+          </div>
+        </div>
+        <div class="amenity-item">
+          <div class="amenity-icon">🛏️</div>
+          <div>
+            <div class="amenity-title" id="t-bed-title">4 Schlafzimmer</div>
+            <div class="amenity-desc" id="t-bed-desc">3x Doppelbett, 1x Einzelbett + Zusatzmatratzen</div>
+          </div>
+        </div>
+        <div class="amenity-item">
+          <div class="amenity-icon">🚲</div>
+          <div>
+            <div class="amenity-title" id="t-bike-title">Fahrräder</div>
+            <div class="amenity-desc" id="t-bike-desc">Fahrräder zur freien Nutzung vorhanden</div>
+          </div>
+        </div>
+        <div class="amenity-item">
+          <div class="amenity-icon">🚿</div>
+          <div>
+            <div class="amenity-title" id="t-bath-title">Bäder</div>
+            <div class="amenity-desc" id="t-bath-desc">Badezimmer + separates Gäste-WC</div>
+          </div>
+        </div>
+        <div class="amenity-item">
+          <div class="amenity-icon">🌿</div>
+          <div>
+            <div class="amenity-title" id="t-garden-title">Garten & Terrasse</div>
+            <div class="amenity-desc" id="t-garden-desc">Sitzmöglichkeiten & Grill</div>
+          </div>
+        </div>
+        <div class="amenity-item">
+          <div class="amenity-icon">🧺</div>
+          <div>
+            <div class="amenity-title" id="t-wash-title">Küche & Waschmaschine</div>
+            <div class="amenity-desc" id="t-wash-desc">Voll ausgestattet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gästebuch & Tipps von Gästen -->
+    <div class="card">
+      <h2>✍️ <span id="t-gb-title">Gästebuch & Besucher*innen-Tipps</span></h2>
+      <form id="guestbookForm" class="guestbook-form">
+        <input type="text" id="gbAuthor" required placeholder="Dein Name" class="guestbook-input">
+        <textarea id="gbText" required placeholder="Hinterlasse einen Gruß, Ausflugstipp oder eine Empfehlung für andere Gäste..." class="guestbook-textarea"></textarea>
+        <button type="submit" class="btn-primary" style="padding: 10px;" id="t-gb-submit">Eintrag veröffentlichen</button>
+      </form>
+      <div id="guestbookList" class="guestbook-list">
+        <div class="badge-empty" id="t-gb-loading">Lade Gästebuch-Einträge...</div>
+      </div>
+    </div>
+
+    <!-- Flensburg Guide & Ausflüge -->
+    <div class="card">
+      <h2>⚓ <span id="t-guide-title">Flensburg Tipps & Ausflüge</span></h2>
+      
+      <div class="guide-item">
+        <div>
+          <div class="guide-title" id="t-guide-1-title">🌊 Historischer Hafen & Promenade</div>
+          <div class="guide-desc" id="t-guide-1-desc">Fischbrötchen, Cafés & Schifffahrtsmuseum</div>
+        </div>
+        <a href="https://maps.google.com/?q=Historischer+Hafen+Flensburg" target="_blank" class="maps-link">Maps</a>
+      </div>
+
+      <div class="guide-item">
+        <div>
+          <div class="guide-title" id="t-guide-2-title">🏖️ Strand Wassersleben & Solitüde</div>
+          <div class="guide-desc" id="t-guide-2-desc">Schöner Ostseestrand zum Baden & Entspannen</div>
+        </div>
+        <a href="https://maps.google.com/?q=Strand+Wassersleben" target="_blank" class="maps-link">Maps</a>
+      </div>
+
+      <div class="guide-item">
+        <div>
+          <div class="guide-title" id="t-guide-3-title">🏛️ Rote Straße (Altstadt)</div>
+          <div class="guide-desc" id="t-guide-3-desc">Malerische Kaufmannshöfe, Boutiquen & Rum-Häuser</div>
+        </div>
+        <a href="https://maps.google.com/?q=Rote+Strasse+Flensburg" target="_blank" class="maps-link">Maps</a>
+      </div>
+
+      <div class="guide-item">
+        <div>
+          <div class="guide-title" id="t-guide-4-title">🏰 Schloss Glücksburg & Schlossteich</div>
+          <div class="guide-desc" id="t-guide-4-desc">Berühmtes Wasserschloss mit Park (ca. 15 Min. mit Auto/Fahrrad)</div>
+        </div>
+        <a href="https://maps.google.com/?q=Schloss+Gl%C3%BCcksburg" target="_blank" class="maps-link">Maps</a>
+      </div>
+
+      <div class="guide-item">
+        <div>
+          <div class="guide-title" id="t-guide-5-title">🌭 Abstecher nach Dänemark / Annies Kiosk</div>
+          <div class="guide-desc" id="t-guide-5-desc">Kult-Hotdog-Stand in Sønderhav mit Blick auf die Ochseninseln</div>
+        </div>
+        <a href="https://maps.google.com/?q=Annies+Kiosk+Sonderhav" target="_blank" class="maps-link">Maps</a>
+      </div>
+
+      <div class="guide-item">
+        <div>
+          <div class="guide-title" id="t-guide-6-title">🔬 Phänomenta & Nordertor</div>
+          <div class="guide-desc" id="t-guide-6-desc">Mitmach-Science-Center und das historische Stadttor</div>
+        </div>
+        <a href="https://maps.google.com/?q=Phaenomenta+Flensburg" target="_blank" class="maps-link">Maps</a>
+      </div>
+
+      <div class="guide-item">
+        <div>
+          <div class="guide-title" id="t-guide-7-title">🍺 Flensburger Brauerei & Plop-Shop</div>
+          <div class="guide-desc" id="t-guide-7-desc">Traditionsbrauerei mit Fanshop und Brauereiführungen</div>
+        </div>
+        <a href="https://maps.google.com/?q=Flensburger+Brauerei" target="_blank" class="maps-link">Maps</a>
+      </div>
+    </div>
+
+    <!-- Hauschef*in / Notfallkontakt -->
+    <div class="card">
+      <h2>🆘 <span id="t-emerg-title">Hauschef*in & Notfallkontakte</span></h2>
+      
+      <!-- Hauschef -->
+      <div class="guide-item" style="border-color: rgba(14, 165, 233, 0.35); background: rgba(14, 165, 233, 0.08);">
+        <div>
+          <div class="guide-title">👑 <span id="t-host-role">Hauschef*in / Gastgeber*in</span>: Peter Emeis Dünnes</div>
+          <div class="guide-desc" id="t-host-desc">📞 01577 4978442 (Notfallkontakt & Fragen)</div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <a href="tel:015774978442" class="maps-link" style="background: rgba(14, 165, 233, 0.3); color: #fff;" id="t-btn-call">📞 Anrufen</a>
+          <a href="https://wa.me/4915774978442" target="_blank" class="maps-link" style="background: rgba(16, 185, 129, 0.25); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">💬 WhatsApp</a>
+        </div>
+      </div>
+
+      <!-- Notruf 112 & 110 -->
+      <div class="guide-item" style="border-color: rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.08);">
+        <div>
+          <div class="guide-title" style="color: #fca5a5;" id="t-sos-title">🚨 Offizieller Notruf (Lebensgefahr)</div>
+          <div class="guide-desc" id="t-sos-desc">Feuerwehr & Rettungsdienst (112) | Polizei (110)</div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <a href="tel:112" class="maps-link" style="background: rgba(239, 68, 68, 0.3); border-color: rgba(239, 68, 68, 0.5); color: #fff;">🚒 112</a>
+          <a href="tel:110" class="maps-link" style="background: rgba(14, 165, 233, 0.3); border-color: rgba(14, 165, 233, 0.5); color: #fff;">🚓 110</a>
+        </div>
+      </div>
+
+      <!-- Apotheken-Notdienst -->
+      <div class="guide-item">
+        <div>
+          <div class="guide-title" id="t-pharmacy-title">💊 Notfall-Apotheken Notdienst</div>
+          <div class="guide-desc" id="t-pharmacy-desc">Tagesaktuelle Notdienst-Apotheken in Flensburg (24/7)</div>
+        </div>
+        <a href="https://www.aponet.de/notdienstsuche/24941-Flensburg" target="_blank" class="maps-link" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;" id="t-pharmacy-btn">🏥 Notdienst-Liste</a>
+      </div>
+
+      <!-- Ärztlicher Bereitschaftsdienst -->
+      <div class="guide-item">
+        <div>
+          <div class="guide-title" id="t-doc-title">🩺 Ärztlicher Bereitschaftsdienst</div>
+          <div class="guide-desc" id="t-doc-desc">Bundesweite Notfallnummer für Nicht-Lebensbedrohliches</div>
+        </div>
+        <a href="tel:116117" class="maps-link" style="background: rgba(255, 255, 255, 0.1); color: #fff;">📞 116 117</a>
+      </div>
+
+      <!-- Supermarkt -->
+      <div class="guide-item">
+        <div>
+          <div class="guide-title" id="t-market-title">🛒 Supermärkte in der Nähe</div>
+          <div class="guide-desc" id="t-market-desc">EDEKA & ALDI (ca. 3 Min mit dem Auto)</div>
+        </div>
+        <a href="https://maps.google.com/?q=Supermarkt+24941+Flensburg" target="_blank" class="maps-link">Maps</a>
+      </div>
+    </div>
+
+    <!-- Belegungen -->
+    <div class="card">
+      <h2>📋 <span id="t-list-title">Aktuelle Belegungen</span></h2>
+      <ul id="bookingList" class="booking-list">
+        <li class="badge-empty" id="t-loading">Lade Daten...</li>
+      </ul>
+    </div>
+
+    <!-- Stornieren -->
+    <div class="card">
+      <h2>❌ <span id="t-cancel-title">Buchung freigeben / stornieren</span></h2>
+      <div class="cancel-row">
+        <input type="text" id="cancelToken" placeholder="Stornierungs-Code (oder Admin-Passwort) eingeben">
+        <button onclick="cancelBooking()" class="btn-danger" id="t-btn-cancel">Stornieren</button>
+      </div>
+      <div id="cancelResult" class="banner"></div>
+    </div>
+  </div>
+
+  <script>
+    let isAdminUnlocked = false;
+    let currentCalDate = new Date();
+    let globalBookings = [];
+    let selectedStartDate = null;
+
+    const translations = {
+      de: {
+        mainTitle: "Ferienhaus Flensburg",
+        mainSub: "Wähle deinen Wunschzeitraum oder verwalte bestehende Reservierungen.",
+        weatherBadge: "⛅ Wetter in Flensburg",
+        weatherLive: "Flensburg Förde Live-Temperatur",
+        weatherErr: "Wetterdaten nicht verfügbar",
+        weekdays: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
+        locTitle: "Adresse & Anreise",
+        locAddress: "Heinrich-Schuldt-Straße 17, 24941 Flensburg",
+        locSub: "Einfamilienhaus mit Garten",
+        locMaps: "🗺️ In Maps öffnen",
+        locDesc: "🔑 <b>Schlüsselsafe:</b> Ein Schlüsselsafe ist vorhanden. Der Code wird dir direkt am Anreisetag mitgeteilt.<br>🚗 <b>Parken:</b> Direkt vor dem Haus und entlang der Straße, sofern freie Plätze vorhanden sind (keine privaten/reservierten Parkplätze).",
+        transitTitle: "Bus & Nahverkehr (Mobilität)",
+        busStopsTitle: "🚏 Haltestellen in der Nähe",
+        busStopsDesc: "Haltestellen <i>Nerongsallee</i> & <i>Goerdelerstraße</i> (wenige Gehminuten) – Direkte Verbindung zum ZOB / Bahnhof",
+        busTimetableBtn: "🗓️ Fahrpläne",
+        busRadarTitle: "📡 Live-Busradar & Route planen",
+        busRadarDesc: "Echtzeit-Fahrplan und Bus-Positionen auf der Karte anzeigen",
+        busRadarBtn: "🗺️ Live-Radar",
+        tasksTitle: "Hauspflichten für Besucher*innen",
+        taskCat: "<b>Katzenbetreuung:</b> Unsere Katze bitte morgens und abends füttern sowie regelmäßig mit ihr spielen und ihr Zuwendung schenken.",
+        taskMail: "<b>Briefkasten:</b> Bitte regelmäßig leeren und Post im Flur ablegen.",
+        taskTrash: "<b>Mülltonnen:</b> 2x monatlich die entsprechenden Mülltonnen an die Straße stellen.",
+        taskClean: "<b>Vor Abreise:</b> Reinigung und liebevolle Pflege des Hauses sowie des Gartens.",
+        folderNote: "📖 <b>Ausführlicher Haus-Ordner:</b> Alle detaillierten Anleitungen, Futterzeiten, Müllkalender und Gerätehinweise findest du im physischen Haus-Ordner vor Ort im Wohnbereich.",
+        calTitle: "Monatsübersicht",
+        legFree: "Frei (Klicken zum Buchen)",
+        legBooked: "Belegt",
+        amenitiesTitle: "Ausstattung & Zimmer",
+        tvTitle: "Fernseher",
+        tvDesc: "Smart TV zur freien Verfügung",
+        bedTitle: "4 Schlafzimmer",
+        bedDesc: "3x Doppelbett, 1x Einzelbett + Zusatzmatratzen",
+        bikeTitle: "Fahrräder",
+        bikeDesc: "Fahrräder zur freien Nutzung vorhanden",
+        bathTitle: "Bäder",
+        bathDesc: "Badezimmer + separates Gäste-WC",
+        gardenTitle: "Garten & Terrasse",
+        gardenDesc: "Sitzmöglichkeiten & Grill",
+        washTitle: "Küche & Waschmaschine",
+        washDesc: "Voll ausgestattet",
+        gbTitle: "Gästebuch & Besucher*innen-Tipps",
+        gbAuthorPh: "Dein Name",
+        gbTextPh: "Hinterlasse einen Gruß, Ausflugstipp oder eine Empfehlung für andere Gäste...",
+        gbSubmit: "Eintrag veröffentlichen",
+        gbEmpty: "Noch keine Einträge. Sei der/die Erste!",
+        guideTitle: "Flensburg Tipps & Ausflüge",
+        guide1Title: "🌊 Historischer Hafen & Promenade",
+        guide1Desc: "Fischbrötchen, Cafés & Schifffahrtsmuseum",
+        guide2Title: "🏖️ Strand Wassersleben & Solitüde",
+        guide2Desc: "Schöner Ostseestrand zum Baden & Entspannen",
+        guide3Title: "🏛️ Rote Straße (Altstadt)",
+        guide3Desc: "Malerische Kaufmannshöfe, Boutiquen & Rum-Häuser",
+        guide4Title: "🏰 Schloss Glücksburg & Schlossteich",
+        guide4Desc: "Berühmtes Wasserschloss mit Park (ca. 15 Min. mit Auto/Fahrrad)",
+        guide5Title: "🌭 Abstecher nach Dänemark / Annies Kiosk",
+        guide5Desc: "Kult-Hotdog-Stand in Sønderhav mit Blick auf die Ochseninseln",
+        guide6Title: "🔬 Phänomenta & Nordertor",
+        guide6Desc: "Mitmach-Science-Center und das historische Stadttor",
+        guide7Title: "🍺 Flensburger Brauerei & Plop-Shop",
+        guide7Desc: "Traditionsbrauerei mit Fanshop und Brauereiführungen",
+        emergTitle: "Hauschef*in & Notfallkontakte",
+        hostRole: "Hauschef*in / Gastgeber*in",
+        hostDesc: "📞 01577 4978442 (Notfallkontakt & Fragen)",
+        btnCall: "📞 Anrufen",
+        sosTitle: "🚨 Offizieller Notruf (Lebensgefahr)",
+        sosDesc: "Feuerwehr & Rettungsdienst (112) | Polizei (110)",
+        pharmacyTitle: "💊 Notfall-Apotheken Notdienst",
+        pharmacyDesc: "Tagesaktuelle Notdienst-Apotheken in Flensburg (24/7)",
+        pharmacyBtn: "🏥 Notdienst-Liste",
+        docTitle: "🩺 Ärztlicher Bereitschaftsdienst",
+        docDesc: "Bundesweite Notfallnummer für Nicht-Lebensbedrohliches",
+        marketTitle: "🛒 Supermärkte in der Nähe",
+        marketDesc: "EDEKA & ALDI (ca. 3 Min mit dem Auto)",
+        bookTitle: "Zeitraum reservieren",
+        labelName: "Dein Name",
+        placeholderName: "z. B. Onkel Markus / Sarah",
+        labelStart: "Anreise",
+        labelEnd: "Abreise",
+        btnBook: "Kostenlos Buchen",
+        listTitle: "Aktuelle Belegungen",
+        cancelTitle: "Buchung freigeben / stornieren",
+        placeholderCancel: "Stornierungs-Code (oder Admin-Passwort)",
+        btnCancel: "Stornieren",
+        emptyList: "Aktuell sind alle Termine frei!",
+        loading: "Lade Belegungen...",
+        copyBtn: "Kopieren",
+        copied: "Kopiert!",
+        adminUnlocked: "🔓 Admin-Modus aktiv: Du kannst nun Buchungen & Kommentare direkt löschen.",
+        successBook: (token) => `🎉 Erfolgreich reserviert!<br>Dein Stornierungs-Code: <span class="token-box"><b>${token}</b> <button class="btn-copy" onclick="copyToken('${token}', this)">Kopieren</button></span><br><small style="color:#cbd5e1">Bitte den Code sichern, um den Zeitraum bei Bedarf freizugeben.</small>`,
+        tokenMissing: "Bitte gib deinen Stornierungs-Code ein."
+      },
+      en: {
+        mainTitle: "Flensburg Guest House",
+        mainSub: "Choose your preferred dates or manage existing reservations.",
+        weatherBadge: "⛅ Weather in Flensburg",
+        weatherLive: "Flensburg Fjord Live Temperature",
+        weatherErr: "Weather data unavailable",
+        weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        locTitle: "Location & Check-in",
+        locAddress: "Heinrich-Schuldt-Straße 17, 24941 Flensburg",
+        locSub: "Single-family home with garden",
+        locMaps: "🗺️ Open in Maps",
+        locDesc: "🔑 <b>Key Safe:</b> A key safe is available. The code will be sent to you directly on check-in day.<br>🚗 <b>Parking:</b> Along the street and in front of the house if free spots are available (no reserved private spaces).",
+        transitTitle: "Bus & Public Transit (Mobility)",
+        busStopsTitle: "🚏 Nearby Bus Stops",
+        busStopsDesc: "Stops <i>Nerongsallee</i> & <i>Goerdelerstraße</i> (short walk) – Direct connection to Central Bus Station (ZOB) & Train Station",
+        busTimetableBtn: "🗓️ Timetables",
+        busRadarTitle: "📡 Live Bus Radar & Trip Planner",
+        busRadarDesc: "Real-time timetable and live bus positions on the map",
+        busRadarBtn: "🗺️ Live Radar",
+        tasksTitle: "House Duties for Guests",
+        taskCat: "<b>Cat Care:</b> Please feed our cat mornings and evenings, play with her, and give her love.",
+        taskMail: "<b>Mailbox:</b> Please empty the mailbox regularly and place mail in the hallway.",
+        taskTrash: "<b>Trash Bins:</b> Place the respective trash bins on the curb twice a month.",
+        taskClean: "<b>Before Departure:</b> Cleaning and loving care of the house and garden.",
+        folderNote: "📖 <b>Detailed House Binder:</b> Instructions, feeding schedules, trash calendar and appliances are inside the physical binder in the living area.",
+        calTitle: "Monthly Overview",
+        legFree: "Available (Click to book)",
+        legBooked: "Booked",
+        amenitiesTitle: "Amenities & Rooms",
+        tvTitle: "Television",
+        tvDesc: "Smart TV available for free use",
+        bedTitle: "4 Bedrooms",
+        bedDesc: "3x double bed, 1x single bed + extra mattresses",
+        bikeTitle: "Bicycles",
+        bikeDesc: "Bicycles available for free use",
+        bathTitle: "Bathrooms",
+        bathDesc: "Full bathroom + separate guest WC",
+        gardenTitle: "Garden & Patio",
+        gardenDesc: "Outdoor seating & BBQ",
+        washTitle: "Kitchen & Laundry",
+        washDesc: "Fully equipped",
+        gbTitle: "Guestbook & Visitor Tips",
+        gbAuthorPh: "Your Name",
+        gbTextPh: "Leave a greeting, excursion tip or recommendation for other guests...",
+        gbSubmit: "Post Entry",
+        gbEmpty: "No entries yet. Be the first!",
+        guideTitle: "Flensburg Highlights & Excursions",
+        guide1Title: "🌊 Historic Harbour & Promenade",
+        guide1Desc: "Fish sandwiches, cafés & maritime museum",
+        guide2Title: "🏖️ Wassersleben & Solitüde Beach",
+        guide2Desc: "Beautiful Baltic Sea beach for swimming & relaxing",
+        guide3Title: "🏛️ Rote Straße (Old Town)",
+        guide3Desc: "Picturesque merchant courtyards, boutiques & rum houses",
+        guide4Title: "🏰 Glücksburg Castle & Lake",
+        guide4Desc: "Famous moated castle with palace gardens (approx. 15 min by car/bike)",
+        guide5Title: "🌭 Day Trip to Denmark / Annie's Kiosk",
+        guide5Desc: "Iconic hotdog stand in Sønderhav overlooking the Ox Islands",
+        guide6Title: "🔬 Phänomenta & Nordertor",
+        guide6Desc: "Hands-on science museum and the historic city gate",
+        guide7Title: "🍺 Flensburger Brewery & Plop Shop",
+        guide7Desc: "Historic brewery with fan shop and guided tours",
+        emergTitle: "Host & Emergency Contacts",
+        hostRole: "House Host / Manager",
+        hostDesc: "📞 01577 4978442 (Emergency contact & questions)",
+        btnCall: "📞 Call",
+        sosTitle: "🚨 Official Emergency (Life-threatening)",
+        sosDesc: "Fire & Ambulance (112) | Police (110)",
+        pharmacyTitle: "💊 Emergency Pharmacy Service",
+        pharmacyDesc: "Current 24/7 on-duty emergency pharmacies in Flensburg",
+        pharmacyBtn: "🏥 On-Duty Pharmacies",
+        docTitle: "🩺 Medical On-Call Service",
+        docDesc: "Nationwide non-emergency medical hotline (after hours)",
+        marketTitle: "🛒 Supermarkets Nearby",
+        marketDesc: "EDEKA & ALDI (approx. 3 min by car)",
+        bookTitle: "Reserve Dates",
+        labelName: "Your Name",
+        placeholderName: "e.g. Uncle Mark / Sarah",
+        labelStart: "Check-in",
+        labelEnd: "Check-out",
+        btnBook: "Book for Free",
+        listTitle: "Reserved Dates",
+        cancelTitle: "Cancel Reservation",
+        placeholderCancel: "Enter cancellation code (or Admin PW)",
+        btnCancel: "Cancel",
+        emptyList: "All dates are currently available!",
+        loading: "Loading bookings...",
+        copyBtn: "Copy",
+        copied: "Copied!",
+        adminUnlocked: "🔓 Admin Mode Active: You can now delete bookings & comments directly.",
+        successBook: (token) => `🎉 Successfully booked!<br>Your cancellation code: <span class="token-box"><b>${token}</b> <button class="btn-copy" onclick="copyToken('${token}', this)">Copy</button></span><br><small style="color:#cbd5e1">Please save this code to cancel your stay if needed.</small>`,
+        tokenMissing: "Please enter your cancellation code."
+      },
+      es: {
+        mainTitle: "Casa Flensburg",
+        mainSub: "Elige tus fechas o gestiona tus reservas existentes.",
+        weatherBadge: "⛅ El Tiempo en Flensburg",
+        weatherLive: "Temperatura en vivo en el Fiordo de Flensburg",
+        weatherErr: "Datos del tiempo no disponibles",
+        weekdays: ["Lu", "Ma", "Mi", "Ju", "Vi", "Sá", "Do"],
+        locTitle: "Ubicación y Llegada",
+        locAddress: "Heinrich-Schuldt-Straße 17, 24941 Flensburg",
+        locSub: "Casa unifamiliar con jardín",
+        locMaps: "🗺️ Abrir en Maps",
+        locDesc: "🔑 <b>Caja de llaves:</b> Hay una caja de llaves disponible. El código se entregará el día de llegada.<br>🚗 <b>Aparcamiento:</b> En la calle y frente a la casa según disponibilidad (sin plazas privadas).",
+        transitTitle: "Autobús y Transporte Público (Movilidad)",
+        busStopsTitle: "🚏 Paradas de Autobús Cercanas",
+        busStopsDesc: "Paradas <i>Nerongsallee</i> y <i>Goerdelerstraße</i> (a pocos minutos a pie) – Conexión directa a Estación Central (ZOB) y Tren",
+        busTimetableBtn: "🗓️ Horarios",
+        busRadarTitle: "📡 Radar de Autobuses en Vivo y Rutas",
+        busRadarDesc: "Horarios en tiempo real y mapa de autobuses en circulación",
+        busRadarBtn: "🗺️ Radar en Vivo",
+        tasksTitle: "Tareas de la Casa para Huéspedes",
+        taskCat: "<b>Cuidado del Gato:</b> Por favor, alimenta al gato mañana y noche, juega con él y dale cariño.",
+        taskMail: "<b>Buzón:</b> Vaciar periódicamente y dejar el correo en la entrada.",
+        taskTrash: "<b>Basura:</b> Sacar los cubos de basura correspondientes a la calle 2 veces al mes.",
+        taskClean: "<b>Antes de salir:</b> Limpieza y cuidado cariñoso de la casa y el jardín.",
+        folderNote: "📖 <b>Carpeta de la Casa:</b> Todos los detalles, horarios del gato y basura se encuentran en la carpeta física en el salón.",
+        calTitle: "Calendario Mensual",
+        legFree: "Libre (Haz clic para reservar)",
+        legBooked: "Ocupado",
+        amenitiesTitle: "Comodidades y Habitaciones",
+        tvTitle: "Televisión",
+        tvDesc: "Smart TV disponible para uso libre",
+        bedTitle: "4 Dormitorios",
+        bedDesc: "3 camas dobles, 1 individual + colchones adicionales",
+        bikeTitle: "Bicicletas",
+        bikeDesc: "Bicicletas disponibles para uso gratuito",
+        bathTitle: "Baños",
+        bathDesc: "Baño completo + aseo de invitados separado",
+        gardenTitle: "Jardín y Terraza",
+        gardenDesc: "Zona exterior y barbacoa",
+        washTitle: "Cocina y Lavandería",
+        washDesc: "Totalmente equipada",
+        gbTitle: "Libro de Visitas y Consejos",
+        gbAuthorPh: "Tu Nombre",
+        gbTextPh: "Deja un saludo, consejo de excursión o recomendación para otros huéspedes...",
+        gbSubmit: "Publicar Comentario",
+        gbEmpty: "Todavía no hay entradas. ¡Sé el primero!",
+        guideTitle: "Guía y Lugares de Interés",
+        guide1Title: "🌊 Puerto Histórico y Paseo",
+        guide1Desc: "Bocadillos de pescado, cafeterías y museo marítimo",
+        guide2Title: "🏖️ Playa Wassersleben y Solitüde",
+        guide2Desc: "Hermosa playa del Mar Báltico para bañarse y relajarse",
+        guide3Title: "🏛️ Rote Straße (Casco Antiguo)",
+        guide3Desc: "Pintorescos patios comerciales, boutiques y casas de ron",
+        guide4Title: "🏰 Castillo de Glücksburg",
+        guide4Desc: "Famoso castillo sobre el agua con parque (aprox. 15 min en coche/bici)",
+        guide5Title: "🌭 Excursión a Dinamarca / Annie's Kiosk",
+        guide5Desc: "Puesto emblemático de perritos calientes con vistas al fiordo",
+        guide6Title: "🔬 Phänomenta y Nordertor",
+        guide6Desc: "Centro interactivo de ciencias y la histórica puerta de la ciudad",
+        guide7Title: "🍺 Cervecería Flensburger y Tienda Plop",
+        guide7Desc: "Cervecería tradicional con tienda oficial y visitas guiadas",
+        emergTitle: "Anfitrión/a y Contactos de Emergencia",
+        hostRole: "Anfitrión/a Principal",
+        hostDesc: "📞 01577 4978442 (Contacto de emergencia y preguntas)",
+        btnCall: "📞 Llamar",
+        sosTitle: "🚨 Emergencias Oficiales (Riesgo vital)",
+        sosDesc: "Bomberos y Ambulancia (112) | Policía (110)",
+        pharmacyTitle: "💊 Farmacias de Guardia",
+        pharmacyDesc: "Farmacias de guardia abiertas en Flensburg (24/7)",
+        pharmacyBtn: "🏥 Lista de Guardia",
+        docTitle: "🩺 Servicio Médico de Guardia",
+        docDesc: "Atención médica para casos que no son de emergencia vital",
+        marketTitle: "🛒 Supermercados Cercanos",
+        marketDesc: "EDEKA y ALDI (aprox. 3 min en coche)",
+        bookTitle: "Reservar Fechas",
+        labelName: "Tu Nombre",
+        placeholderName: "ej. Tío Marcos / Sara",
+        labelStart: "Llegada",
+        labelEnd: "Salida",
+        btnBook: "Reservar Gratis",
+        listTitle: "Fechas Ocupadas",
+        cancelTitle: "Cancelar Reserva",
+        placeholderCancel: "Introduce el código (o clave de admin)",
+        btnCancel: "Cancelar",
+        emptyList: "¡Todas las fechas están disponibles actualmente!",
+        loading: "Cargando fechas...",
+        copyBtn: "Copiar",
+        copied: "¡Copiado!",
+        adminUnlocked: "🔓 Modo Admin Activado: Ahora puedes eliminar reservas y comentarios.",
+        successBook: (token) => `🎉 ¡Reserva exitosa!<br>Tu código de cancelación: <span class="token-box"><b>${token}</b> <button class="btn-copy" onclick="copyToken('${token}', this)">Copiar</button></span><br><small style="color:#cbd5e1">Guarda este código para cancelar si es necesario.</small>`,
+        tokenMissing: "Por favor, introduce tu código de cancelación."
+      }
+    };
+
+    let currentLang = 'de';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.toLowerCase().includes(lang));
+      });
+
+      const t = translations[lang];
+      document.getElementById('t-main-title').innerText = t.mainTitle;
+      document.getElementById('t-main-sub').innerText = t.mainSub;
+      document.getElementById('t-weather-badge').innerText = t.weatherBadge;
+
+      const weekdaysContainer = document.getElementById('calWeekdays');
+      weekdaysContainer.innerHTML = t.weekdays.map(w => `<div class="cal-weekday">${w}</div>`).join('');
+
+      document.getElementById('t-loc-title').innerText = t.locTitle;
+      document.getElementById('t-loc-address').innerText = t.locAddress;
+      document.getElementById('t-loc-sub').innerText = t.locSub;
+      document.getElementById('t-loc-maps').innerText = t.locMaps;
+      document.getElementById('t-loc-desc').innerHTML = t.locDesc;
+      
+      document.getElementById('t-transit-title').innerText = t.transitTitle;
+      document.getElementById('t-bus-stops-title').innerHTML = t.busStopsTitle;
+      document.getElementById('t-bus-stops-desc').innerHTML = t.busStopsDesc;
+      document.getElementById('t-bus-timetable-btn').innerText = t.busTimetableBtn;
+      document.getElementById('t-bus-radar-title').innerText = t.busRadarTitle;
+      document.getElementById('t-bus-radar-desc').innerText = t.busRadarDesc;
+      document.getElementById('t-bus-radar-btn').innerText = t.busRadarBtn;
+
+      document.getElementById('t-tasks-title').innerText = t.tasksTitle;
+      document.getElementById('t-task-cat').innerHTML = t.taskCat;
+      document.getElementById('t-task-mail').innerHTML = t.taskMail;
+      document.getElementById('t-task-trash').innerHTML = t.taskTrash;
+      document.getElementById('t-task-clean').innerHTML = t.taskClean;
+      document.getElementById('t-folder-note').innerHTML = t.folderNote;
+
+      document.getElementById('t-cal-title').innerText = t.calTitle;
+      document.getElementById('t-leg-free').innerText = t.legFree;
+      document.getElementById('t-leg-booked').innerText = t.legBooked;
+
+      document.getElementById('t-amenities-title').innerText = t.amenitiesTitle;
+      document.getElementById('t-tv-title').innerText = t.tvTitle;
+      document.getElementById('t-tv-desc').innerText = t.tvDesc;
+      document.getElementById('t-bed-title').innerText = t.bedTitle;
+      document.getElementById('t-bed-desc').innerText = t.bedDesc;
+      document.getElementById('t-bike-title').innerText = t.bikeTitle;
+      document.getElementById('t-bike-desc').innerText = t.bikeDesc;
+      document.getElementById('t-bath-title').innerText = t.bathTitle;
+      document.getElementById('t-bath-desc').innerText = t.bathDesc;
+      document.getElementById('t-garden-title').innerText = t.gardenTitle;
+      document.getElementById('t-garden-desc').innerText = t.gardenDesc;
+      document.getElementById('t-wash-title').innerText = t.washTitle;
+      document.getElementById('t-wash-desc').innerText = t.washDesc;
+      
+      document.getElementById('t-gb-title').innerText = t.gbTitle;
+      document.getElementById('gbAuthor').placeholder = t.gbAuthorPh;
+      document.getElementById('gbText').placeholder = t.gbTextPh;
+      document.getElementById('t-gb-submit').innerText = t.gbSubmit;
+
+      document.getElementById('t-guide-title').innerText = t.guideTitle;
+      document.getElementById('t-guide-1-title').innerText = t.guide1Title;
+      document.getElementById('t-guide-1-desc').innerText = t.guide1Desc;
+      document.getElementById('t-guide-2-title').innerText = t.guide2Title;
+      document.getElementById('t-guide-2-desc').innerText = t.guide2Desc;
+      document.getElementById('t-guide-3-title').innerText = t.guide3Title;
+      document.getElementById('t-guide-3-desc').innerText = t.guide3Desc;
+      document.getElementById('t-guide-4-title').innerText = t.guide4Title;
+      document.getElementById('t-guide-4-desc').innerText = t.guide4Desc;
+      document.getElementById('t-guide-5-title').innerText = t.guide5Title;
+      document.getElementById('t-guide-5-desc').innerText = t.guide5Desc;
+      document.getElementById('t-guide-6-title').innerText = t.guide6Title;
+      document.getElementById('t-guide-6-desc').innerText = t.guide6Desc;
+      document.getElementById('t-guide-7-title').innerText = t.guide7Title;
+      document.getElementById('t-guide-7-desc').innerText = t.guide7Desc;
+
+      document.getElementById('t-emerg-title').innerText = t.emergTitle;
+      document.getElementById('t-host-role').innerText = t.hostRole;
+      document.getElementById('t-host-desc').innerText = t.hostDesc;
+      document.getElementById('t-btn-call').innerText = t.btnCall;
+      document.getElementById('t-sos-title').innerText = t.sosTitle;
+      document.getElementById('t-sos-desc').innerText = t.sosDesc;
+      document.getElementById('t-pharmacy-title').innerText = t.pharmacyTitle;
+      document.getElementById('t-pharmacy-desc').innerText = t.pharmacyDesc;
+      document.getElementById('t-pharmacy-btn').innerText = t.pharmacyBtn;
+      document.getElementById('t-doc-title').innerText = t.docTitle;
+      document.getElementById('t-doc-desc').innerText = t.docDesc;
+      document.getElementById('t-market-title').innerText = t.marketTitle;
+      document.getElementById('t-market-desc').innerText = t.marketDesc;
+
+      document.getElementById('t-book-title').innerText = t.bookTitle;
+      document.getElementById('t-label-name').innerText = t.labelName;
+      document.getElementById('guestName').placeholder = t.placeholderName;
+      document.getElementById('t-label-start').innerText = t.labelStart;
+      document.getElementById('t-label-end').innerText = t.labelEnd;
+      document.getElementById('t-btn-book').innerText = t.btnBook;
+      document.getElementById('t-list-title').innerText = t.listTitle;
+      document.getElementById('t-cancel-title').innerText = t.cancelTitle;
+      document.getElementById('cancelToken').placeholder = t.placeholderCancel;
+      document.getElementById('t-btn-cancel').innerText = t.btnCancel;
+      
+      renderCalendar();
+      loadBookings();
+      loadGuestbook();
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+      }
+    }
+
+    function copyToken(token, btn) {
+      navigator.clipboard.writeText(token);
+      btn.innerText = translations[currentLang].copied;
+      setTimeout(() => btn.innerText = translations[currentLang].copyBtn, 2000);
+    }
+
+    function copyWifi(wifiPw, btn) {
+      navigator.clipboard.writeText(wifiPw);
+      btn.innerText = 'Kopiert!';
+      setTimeout(() => btn.innerText = 'Kopieren', 2000);
+    }
+
+    async function loadWeather() {
+      try {
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=54.7833&longitude=9.4333&current=temperature_2m');
+        const data = await res.json();
+        const temp = Math.round(data.current.temperature_2m);
+        document.getElementById('weatherTemp').innerText = `${temp}°C`;
+        document.getElementById('weatherStatus').innerText = translations[currentLang].weatherLive;
+      } catch {
+        document.getElementById('weatherStatus').innerText = translations[currentLang].weatherErr;
+      }
+    }
+
+    function prevMonth() {
+      currentCalDate.setMonth(currentCalDate.getMonth() - 1);
+      renderCalendar();
+    }
+
+    function nextMonth() {
+      currentCalDate.setMonth(currentCalDate.getMonth() + 1);
+      renderCalendar();
+    }
+
+    function selectDateFromCalendar(dateStr) {
+      const startInput = document.getElementById('startDate');
+      const endInput = document.getElementById('endDate');
+
+      if (!selectedStartDate || (selectedStartDate && dateStr <= selectedStartDate)) {
+        selectedStartDate = dateStr;
+        startInput.value = dateStr;
+        endInput.value = '';
+      } else {
+        endInput.value = dateStr;
+        selectedStartDate = null;
+        document.getElementById('bookingSection').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function renderCalendar() {
+      const year = currentCalDate.getFullYear();
+      const month = currentCalDate.getMonth();
+      const monthNames = {
+        de: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+        en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        es: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+      };
+
+      document.getElementById('calMonthYear').innerText = `${monthNames[currentLang][month]} ${year}`;
+
+      const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const calGrid = document.getElementById('calendarDays');
+      calGrid.innerHTML = '';
+
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'cal-day empty';
+        calGrid.appendChild(emptyDiv);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayDiv = document.createElement('div');
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        const isBooked = globalBookings.some(b => dateStr >= b.startDate && dateStr <= b.endDate);
+        dayDiv.className = `cal-day ${isBooked ? 'booked' : 'free'}`;
+        dayDiv.innerText = day;
+
+        if (!isBooked) {
+          dayDiv.title = 'Klicken, um Start/Enddatum zu wählen';
+          dayDiv.onclick = () => selectDateFromCalendar(dateStr);
+        }
+        calGrid.appendChild(dayDiv);
+      }
+    }
+
+    async function loadBookings() {
+      try {
+        const res = await fetch('/api/bookings');
+        globalBookings = await res.json();
+        const list = document.getElementById('bookingList');
+        list.innerHTML = '';
+
+        if (globalBookings.length === 0) {
+          list.innerHTML = `<li class="badge-empty">${translations[currentLang].emptyList}</li>`;
+        } else {
+          globalBookings.forEach(b => {
+            const li = document.createElement('li');
+            li.className = 'booking-item';
+            li.innerHTML = `
+              <span class="booking-name">${escapeHtml(b.guestName)}</span>
+              <div class="booking-right">
+                <span class="booking-dates">${formatDate(b.startDate)} → ${formatDate(b.endDate)}</span>
+                <button class="btn-admin-del" style="display: ${isAdminUnlocked ? 'inline-block' : 'none'}" onclick="adminDeleteBooking('${b.id}')">Löschen</button>
+              </div>
+            `;
+            list.appendChild(li);
+          });
+        }
+        renderCalendar();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function loadGuestbook() {
+      try {
+        const res = await fetch('/api/guestbook');
+        const entries = await res.json();
+        const list = document.getElementById('guestbookList');
+        list.innerHTML = '';
+
+        if (!entries || entries.length === 0) {
+          list.innerHTML = `<div class="badge-empty">${translations[currentLang].gbEmpty}</div>`;
+          return;
+        }
+
+        entries.forEach(e => {
+          const div = document.createElement('div');
+          div.className = 'guestbook-entry';
+          div.innerHTML = `
+            <div class="guestbook-meta">
+              <span>👤 ${escapeHtml(e.author)}</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="guestbook-date">${escapeHtml(e.date)}</span>
+                <button class="btn-admin-del" style="display: ${isAdminUnlocked ? 'inline-block' : 'none'}" onclick="adminDeleteGuestbook('${e.id}')">Löschen</button>
+              </div>
+            </div>
+            <div class="guestbook-msg">${escapeHtml(e.text)}</div>
+          `;
+          list.appendChild(div);
+        });
+      } catch (err) {
+        console.error('Fehler beim Laden des Gästebuchs:', err);
+      }
+    }
+
+    document.getElementById('guestbookForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const authorInput = document.getElementById('gbAuthor');
+      const textInput = document.getElementById('gbText');
+      const author = authorInput.value.trim();
+      const text = textInput.value.trim();
+
+      if (!author || !text) return;
+
+      try {
+        const res = await fetch('/api/guestbook', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ author, text })
+        });
+
+        if (res.ok) {
+          authorInput.value = '';
+          textInput.value = '';
+          await loadGuestbook();
+        } else {
+          const errData = await res.json();
+          alert(errData.error || 'Fehler beim Speichern.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Verbindungsfehler beim Absenden des Kommentars.');
+      }
+    });
+
+    async function adminDeleteGuestbook(id) {
+      if (!confirm('Möchtest du diesen Kommentar wirklich löschen?')) return;
+      try {
+        const res = await fetch(`/api/guestbook/${id}?adminKey=admin123`, { method: 'DELETE' });
+        if (res.ok) {
+          loadGuestbook();
+        } else {
+          alert('Fehler beim Löschen des Eintrags.');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const [y, m, d] = dateStr.split('-');
+      return `${d}.${m}.${y}`;
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        guestName: document.getElementById('guestName').value,
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value
+      };
+
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      const out = document.getElementById('bookingResult');
+      out.className = 'banner';
+
+      if (!res.ok) {
+        out.classList.add('error');
+        out.innerText = data.error;
+      } else {
+        out.classList.add('success');
+        out.innerHTML = translations[currentLang].successBook(data.cancelToken);
+        document.getElementById('bookingForm').reset();
+        loadBookings();
+        triggerConfetti();
+      }
+    });
+
+    async function cancelBooking() {
+      const token = document.getElementById('cancelToken').value.trim();
+      const out = document.getElementById('cancelResult');
+      out.className = 'banner';
+
+      if (!token) {
+        out.classList.add('error');
+        out.innerText = translations[currentLang].tokenMissing;
+        return;
+      }
+
+      if (token === 'admin123') {
+        isAdminUnlocked = true;
+        out.classList.add('success');
+        out.innerText = translations[currentLang].adminUnlocked;
+        loadBookings();
+        loadGuestbook();
+        return;
+      }
+
+      const res = await fetch(`/api/bookings/${token}`, { method: 'DELETE' });
+      const data = await res.json();
+
+      if (!res.ok) {
+        out.classList.add('error');
+        out.innerText = data.error;
+      } else {
+        out.classList.add('success');
+        out.innerText = data.message;
+        document.getElementById('cancelToken').value = '';
+        loadBookings();
+      }
+    }
+
+    async function adminDeleteBooking(id) {
+      if (!confirm('Möchtest du diese Buchung als Admin wirklich löschen?')) return;
+      
+      const res = await fetch(`/api/bookings/admin123?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      const out = document.getElementById('cancelResult');
+      out.className = 'banner';
+
+      if (res.ok) {
+        out.classList.add('success');
+        out.innerText = data.message;
+        loadBookings();
+      } else {
+        out.classList.add('error');
+        out.innerText = data.error;
+      }
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('startDate').min = today;
+    document.getElementById('endDate').min = today;
+
+    loadWeather();
+    loadBookings();
+    loadGuestbook();
+  </script>
+</body>
+</html>
