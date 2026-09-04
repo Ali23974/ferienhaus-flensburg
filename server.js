@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const crypto = require('crypto');
@@ -7,8 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const MASTER_ADMIN_KEY = 'admin123';
 
-// Dein Atlas Verbindungs-Link
-const uri = "mongodb+srv://alinkapusuzoglu_db_user:VYMUZ31AJGzvQpeK@cluster0.44angng.mongodb.net/?appName=Cluster0";
+const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri);
 
 let db, bookingsCollection, guestbookCollection;
