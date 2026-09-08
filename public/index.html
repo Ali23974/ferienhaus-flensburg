@@ -260,7 +260,6 @@
     .guide-title { font-size: 0.85rem; font-weight: 700; color: #f1f5f9; }
     .guide-desc { font-size: 0.75rem; color: var(--text-muted); }
 
-    /* WhatsApp Button Layout Fix */
     .guide-item a[href*="whatsapp"], .guide-item div:has(> a[href*="whatsapp"]) {
       max-width: 100% !important;
       box-sizing: border-box !important;
@@ -346,7 +345,7 @@
     .banner.success { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); display: block; animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
     @keyframes popIn { 0% { transform: scale(0.92); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     .token-box { display: inline-flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 6px; font-family: monospace; font-size: 1.1rem; color: #fff; border: 1px solid rgba(255,255,255,0.2); }
-    .btn-copy { background: rgba(255,255,255,0.15); color: #fff; padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; }
+    .btn-copy { background: rgba(255,255,255,0.15); color: #fff; padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; border: none; }
     .btn-copy:hover { background: rgba(255,255,255,0.3); }
     .badge-empty { color: var(--text-muted); font-style: italic; text-align: center; padding: 20px 0; }
   </style>
@@ -611,14 +610,14 @@
       </div>
     </div>
 
-    <!-- Hauschef*in / Notfallkontakt -->
+    <!-- Hauschef*in / Notfallkontakt (Hier angepasst mit Peter Emeis-Dünnes & Gesa Dünnes) -->
     <div class="card">
       <h2>🆘 <span id="t-emerg-title">Hauschef*in & Notfallkontakte</span></h2>
       
       <!-- Hauschef -->
       <div class="guide-item" style="border-color: rgba(14, 165, 233, 0.35); background: rgba(14, 165, 233, 0.08);">
         <div>
-          <div class="guide-title">👑 <span id="t-host-role">Hauschef*in / Gastgeber*in</span>: Peter Emeis Dünnes</div>
+          <div class="guide-title">👑 <span id="t-host-role">Hauschef*in / Gastgeber*in</span>: Peter Emeis-Dünnes & Gesa Dünnes</div>
           <div class="guide-desc" id="t-host-desc">📞 01577 4978442 (Notfallkontakt & Fragen)</div>
         </div>
         <div style="display: flex; gap: 6px; flex-wrap: wrap;">
@@ -1376,5 +1375,17 @@
     loadBookings();
     loadGuestbook();
   </script>
+
+  <!-- Korrigierter Footer mit sauberem Layout (clear: both), Impressum nur für Peter Emeis-Dünnes -->
+  <footer style="clear: both; width: 100%; text-align: center; padding: 30px 20px; font-size: 14px; color: #ccc; background: rgba(0, 0, 0, 0.8); margin-top: 50px; border-top: 1px solid rgba(255,255,255,0.1);">
+    <p><strong>Impressum</strong></p>
+    <p>Angaben gemäß § 5 DDG / TMG:</p>
+    <p>Peter Emeis-Dünnes<br>
+    Heinrich-Schuldt-Str. 17<br>
+    24939 Flensburg<br>
+    Deutschland</p>
+    <p>Kontakt:<br>
+    E-Mail: Peter.emeis-duennes@gmx.de</p>
+  </footer>
 </body>
 </html>
